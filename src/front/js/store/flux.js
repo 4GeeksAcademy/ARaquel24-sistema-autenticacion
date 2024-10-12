@@ -13,13 +13,68 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			auth: false
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
+			logout: () => {
+				console.log("logout desde flux")
+				localStorage.removeItem("token")
+				setStore( {auth : false});
+			},
+			
+
+			login: (email, password) => {
+				
+				const resquestOptions = {
+					method: 'POST',
+					headers: {'content-Type' : 'application/json'},
+					body: JSON.stringify({
+						"email": email,
+						"password" : password
+					})
+				};
+				fetch(`${process.env.BACKEND_URL}/api/login`, resquestOptions)
+					.then(response => {
+						console.log (response.status)
+						if (response.status == 200){
+							setStore( {auth : true});
+						}
+						return response.json()
+					})
+					.then(data => {
+						localStorage.setItem("token",data.access_token)
+						console.log(data)
+					});
+			},
+			signup: (email, password) => {
+				
+				const resquestOptions = {
+					method: 'POST',
+					headers: {'content-Type' : 'application/json'},
+					body: JSON.stringify({
+						"email": email,
+						"password" : password
+					})
+				};
+				fetch(`${process.env.BACKEND_URL}/api/signup`, resquestOptions)
+					.then(response => {
+						console.log (response.status)
+						if (response.status == 200){
+							setStore( {auth : true});
+						}
+						return response.json()
+					})
+					.then(data => {
+						localStorage.setItem("token",data.access_token)
+						console.log(data)
+					});
+			},
+
 
 			getMessage: async () => {
 				try{
